@@ -28,7 +28,7 @@ add_library(kc
 
 target_include_directories(kc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(kc PRIVATE PkgConfig::FREENECT ${FREENECT_SYNC_LIBRARY})
-target_compile_options(kc PRIVATE -Wall -Wextra)
+target_compile_options(kc PRIVATE -Wall -Wextra -Werror)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_subdirectory(apps/kc-view)

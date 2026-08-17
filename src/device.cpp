@@ -49,9 +49,9 @@ bool Device::open() {
     streaming_ = true;
     log_info("kinect device opened");
     log_debug("depth stream: device " + std::to_string(DEVICE_INDEX) + ", " +
-          std::to_string(DEPTH_WIDTH) + "x" +
-          std::to_string(DEPTH_HEIGHT) + ", millimeters, " +
-          std::to_string(DEVICE_TICKS_PER_SECOND) + " ticks per second");
+              std::to_string(DEPTH_WIDTH) + "x" + std::to_string(DEPTH_HEIGHT) +
+              ", millimeters, " + std::to_string(DEVICE_TICKS_PER_SECOND) +
+              " ticks per second");
     return true;
 }
 

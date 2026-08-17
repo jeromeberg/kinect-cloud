@@ -80,11 +80,11 @@ void run(GLFWwindow* window, kc::Source& source) {
 }  // namespace
 
 int main(int argc, char** argv) {
-    if(argc != 1 && argc != 2) {
+    if (argc != 1 && argc != 2) {
         std::fprintf(stderr, "usage: kc-view [-v]\n");
         return 1;
     }
-    if(argc == 2 && std::strcmp(argv[1], "-v") == 0) {
+    if (argc == 2 && std::strcmp(argv[1], "-v") == 0) {
         kc::set_log_level(kc::Level::Debug);
     }
 
