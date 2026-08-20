@@ -24,7 +24,9 @@ endif()
 add_library(kc
     src/cloud.cpp
     src/device.cpp
-    src/log.cpp)
+    src/log.cpp
+    src/recorder.cpp
+    src/replay.cpp)
 
 target_include_directories(kc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(kc PRIVATE PkgConfig::FREENECT ${FREENECT_SYNC_LIBRARY})
@@ -32,4 +34,5 @@ target_compile_options(kc PRIVATE -Wall -Wextra -Werror)
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_subdirectory(apps/kc-view)
+    add_subdirectory(apps/kc-record)
 endif()

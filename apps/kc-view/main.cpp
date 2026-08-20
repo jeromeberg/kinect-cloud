@@ -3,6 +3,7 @@
 #include <kc/cloud.hpp>
 #include <kc/device.hpp>
 #include <kc/log.hpp>
+#include <kc/replay.hpp>
 
 #include "camera.hpp"
 #include "gl.hpp"
@@ -12,6 +13,31 @@ namespace {
 constexpr int WINDOW_WIDTH = 1024;
 constexpr int WINDOW_HEIGHT = 768;
 constexpr float POINT_SIZE = 2.0f;
+
+struct Args {
+    const char* path = nullptr;
+    bool verbose = false;
+};
+
+bool parse_args(int argc, char** argv, Args& args) {
+    if (argc > 3) return false;
+
+    for (int i = 1; i < argc; ++i) {
+        if (std::strcmp(argv[i], "-v") == 0) {
+            args.verbose = true;
+            continue;
+        }
+        if (args.path) return false;
+        args.path = argv[i];
+    }
+    return true;
+}
+
+kc::Source* open_source(const Args& args, kc::Device& device,
+                        kc::Replay& replay) {
+    if (args.path) return replay.open(args.path) ? &replay : nullptr;
+    return device.open() ? &device : nullptr;
+}
 
 GLFWwindow* create_window() {
     if (!glfwInit()) {
@@ -56,8 +82,6 @@ void render(GLFWwindow* window, const Camera& camera, const kc::Cloud& cloud) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     set_projection(width, height);
     apply_camera(camera);
-    // kc's cloud is +X right, +Y down, +Z forward; OpenGL eye space is
-    // +X right, +Y up, +Z toward the viewer. Flip Y and Z to convert.
     glScalef(1.0f, -1.0f, -1.0f);
     draw_cloud(cloud);
     glfwSwapBuffers(window);
@@ -80,26 +104,23 @@ void run(GLFWwindow* window, kc::Source& source) {
 }  // namespace
 
 int main(int argc, char** argv) {
-    if (argc != 1 && argc != 2) {
-        std::fprintf(stderr, "usage: kc-view [-v]\n");
+    Args args;
+    if (!parse_args(argc, argv, args)) {
+        std::fprintf(stderr, "usage: kc-view [file] [-v]\n");
         return 1;
     }
-    if (argc == 2 && std::strcmp(argv[1], "-v") == 0) {
-        kc::set_log_level(kc::Level::Debug);
-    }
+    if (args.verbose) kc::set_log_level(kc::Level::Debug);
 
     kc::Device device;
-    if (!device.open()) return 1;
+    kc::Replay replay;
+    kc::Source* source = open_source(args, device, replay);
+    if (!source) return 1;
 
     GLFWwindow* window = create_window();
-    if (!window) {
-        device.close();
-        return 1;
-    }
+    if (!window) return 1;
 
-    run(window, device);
+    run(window, *source);
 
-    device.close();
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

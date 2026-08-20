@@ -4,3 +4,4 @@ bin/
 *.d
 .DS_Store
 .cache
+*.kc
